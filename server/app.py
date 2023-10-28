@@ -27,8 +27,21 @@ def index_articles():
 
 @app.route('/articles/<int:id>')
 def show_article(id):
+    no_of_requests=session.get("page_views")
 
-    pass
+    if no_of_requests > 3:
+        return {
+            "message":"you have reached page limit"
+        }
+    session["page_views"] += 1
+
+    article=Article.query.get(id)
+    if article:
+        return make_response(jsonify(article.to_dict()), 200)
+
+    return make_response({
+        "error": "article not found"
+    }, 400) 
 
 if __name__ == '__main__':
     app.run(port=5555)
